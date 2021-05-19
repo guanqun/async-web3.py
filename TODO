@@ -1,0 +1,3 @@
+1. add flake8
+2. add python lints. tox etc
+3. add .github actions
