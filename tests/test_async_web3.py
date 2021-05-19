@@ -1,5 +1,11 @@
-from async_web3 import __version__
+import asyncio
+import pytest
 
 
-def test_version():
-    assert __version__ == '0.1.0'
+def test_smoke():
+    print("smoke test")
+
+
+@pytest.mark.asyncio
+async def test_example(event_loop):
+    await asyncio.sleep(0, loop=event_loop)

@@ -1,0 +1,1 @@
+This is the opinionated web3 library, the whole purpose of this new library is to have async API as the first class.
