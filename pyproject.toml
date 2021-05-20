@@ -28,3 +28,11 @@ line-length = 88
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.towncrier]
+package = "async-web3"
+filename = "docs/releases.rst"
+directory = "newsfragments"
+underlines = ["-", "~", "^"]
+issue_format = "`#{issue} <https://github.com/guanqun/async-web3.py/issues/{issue}>`__"
+title_format = "v{version} ({project_date})"
