@@ -77,11 +77,13 @@ class AsyncWeb3:
         async for msg in self.ws:
             self.logger.debug(f"websocket inbound: {msg}")
             jo = json.loads(msg)
-            if "subscription" in jo:
-                subscription_id = int(jo["subscription"], 16)
+            if "method" in jo and jo["method"] == "eth_subscription":
+                params = jo["params"]
+                subscription_id = int(params["subscription"], 16)
                 if subscription_id in self._subscriptions:
                     # TODO: maybe wrap this as block info?
-                    self._subscriptions[subscription_id].put_nowait(jo["params"])
+                    print("put in the queue")
+                    self._subscriptions[subscription_id].put_nowait(params["result"])
             if "id" in jo:
                 request_id = jo["id"]
                 if request_id in self._requests:
