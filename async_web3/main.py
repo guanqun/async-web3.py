@@ -17,7 +17,7 @@ class AsyncWeb3:
         self.websocket_uri = websocket_uri
 
         self.rpc_counter = itertools.count(1)
-        self.ws: websockets.WebSocketClientProtocol = None
+        self.ws: Optional[websockets.WebSocketClientProtocol] = None
 
         self._requests: Dict[int, asyncio.Future] = {}
         self._subscriptions: Dict[str, asyncio.Queue] = {}
