@@ -4,6 +4,10 @@ from typing import Optional, Dict, Any
 import logging
 import websockets
 import json
+from web3.types import Wei, Address
+
+from .subscription import Subscription
+from .methods import RPCMethod
 
 
 class AsyncWeb3:
@@ -13,9 +17,10 @@ class AsyncWeb3:
         self.websocket_uri = websocket_uri
 
         self.rpc_counter = itertools.count(1)
-        self.ws = None
+        self.ws: websockets.WebSocketClientProtocol = None
 
         self._requests: Dict[int, asyncio.Future] = {}
+        self._subscriptions: Dict[int, asyncio.Queue] = {}
 
     async def connect(self):
         self.ws = await websockets.connect(self.websocket_uri)
@@ -29,6 +34,28 @@ class AsyncWeb3:
 
         return True
 
+    @property
+    async def block_number(self) -> int:
+        hex_block = await self.ws_request(RPCMethod.eth_blockNumber)
+        # it's a hex block
+        return int(hex_block, 16)
+
+    @property
+    async def gas_price(self) -> Wei:
+        hex_wei = await self.ws_request(RPCMethod.eth_gasPrice)
+        return Wei(int(hex_wei, 16))
+
+    async def get_balance(self, address: Address) -> Wei:
+        hex_wei = await self.ws_request(RPCMethod.eth_getBalance, [address])
+
+    async def subscribe_block(self) -> Subscription:
+        subscription_str = await self.ws_request(RPCMethod.eth_subscribe, ["newHeads"])
+        subscription_id = int(subscription_str, 16)
+
+        queue = asyncio.Queue()
+        self._subscriptions[subscription_id] = queue
+        return Subscription(queue)
+
     async def ws_request(self, method, params: Any = None):
         counter = next(self.rpc_counter)
         rpc_dict = {
@@ -41,16 +68,21 @@ class AsyncWeb3:
         fut = asyncio.get_event_loop().create_future()
         self._requests[counter] = fut
         await self.ws.send(encoded)
+        self.logger.debug(f"websocket outbound: {encoded}")
         result = await fut
         del self._requests[counter]
         return result
 
-    async def ws_subscribe(self):
-        pass
-
     async def ws_process(self):
         async for msg in self.ws:
+            self.logger.debug(f"websocket inbound: {msg}")
             jo = json.loads(msg)
-            request_id = jo["id"]
-            if request_id in self._requests:
-                self._requests[request_id].set_result(jo["result"])
+            if "subscription" in jo:
+                subscription_id = int(jo["subscription"], 16)
+                if subscription_id in self._subscriptions:
+                    # TODO: maybe wrap this as block info?
+                    self._subscriptions[subscription_id].put_nowait(jo["params"])
+            if "id" in jo:
+                request_id = jo["id"]
+                if request_id in self._requests:
+                    self._requests[request_id].set_result(jo["result"])
