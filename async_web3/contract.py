@@ -16,7 +16,7 @@ class ContractFunction:
         self.fn_abi = fn_abi
         self.fn_selector = build_function_selector(fn_abi)
 
-    def encode_input(self, *args):
+    def encode_input(self, *args, **kwargs):
         data = format_input(self.fn_abi, args)
         types_list = get_type_strings(self.fn_abi["inputs"])
         return self.fn_selector + eth_abi.encode_abi(types_list, data).hex()
@@ -26,17 +26,12 @@ class ContractFunction:
         # prepare the call parameter
         call_transaction = {}
         call_transaction['to'] = self.contract_address
-        call_transaction['data'] = self.encode_input(*args)
+        call_transaction['data'] = self.encode_input(*args, **kwargs)
 
-        print(call_transaction)
-        # selector = encode_hex(function_abi_to_4byte_selector(abi))  # type: ignore
+        async def async_call_impl(web3, call_transaction):
+            return await web3.call(call_transaction)
 
-        async def async_call_impl(web3):
-            #result = await web3.call(call_transaction)
-            #return result
-            pass
-
-        return async_call_impl(self.web3, self.func_abi, *args, **kwargs)
+        return async_call_impl(self.web3, call_transaction)
 
 
 class Contract:

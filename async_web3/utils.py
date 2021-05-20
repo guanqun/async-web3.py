@@ -49,68 +49,58 @@ def build_function_selector(abi: Dict) -> str:
 # following functions are copied from brownie's normalize.py
 
 
-def to_uint(value: Any, type_str: str = "uint256") -> Wei:
+def to_uint(value: Any, type_str: str = "uint256"):
     """Convert a value to an unsigned integer"""
-    wei: Wei = Wei(value)
-    lower, upper = get_int_bounds(type_str)
-    if wei < lower or wei > upper:
-        raise OverflowError(f"{value} is outside allowable range for {type_str}")
-    return wei
+    return int(value)
 
 
-def to_int(value: Any, type_str: str = "int256") -> Wei:
+def to_int(value: Any, type_str: str = "int256"):
     """Convert a value to a signed integer"""
-    wei = Wei(value)
-    lower, upper = get_int_bounds(type_str)
-    if wei < lower or wei > upper:
-        raise OverflowError(f"{value} is outside allowable range for {type_str}")
-    return wei
+    return int(value)
 
 
-def to_decimal(value: Any) -> Fixed:
+def to_decimal(value: Any):
     """Convert a value to a fixed point decimal"""
-    d: Fixed = Fixed(value)
-    if d < -(2 ** 127) or d >= 2 ** 127:
-        raise OverflowError(f"{value} is outside allowable range for decimal")
-    if d.quantize(Decimal("1.0000000000")) != d:
-        raise ValueError("Maximum of 10 decimal points allowed")
-    return d
+    return 0
 
 
 def to_address(value: str) -> str:
     """Convert a value to an address"""
-    return str(EthAddress(value))
+    return value
+    #return str(EthAddress(value))
 
 
 def to_bytes(value: Any, type_str: str = "bytes32") -> bytes:
     """Convert a value to bytes"""
-    return bytes(HexString(value, type_str))
+    return value
+    #return bytes(HexString(value, type_str))
 
 
 def to_bool(value: Any) -> bool:
     """Convert a value to a boolean"""
-    if not isinstance(value, (int, float, bool, bytes, str)):
-        raise TypeError(f"Cannot convert {type(value).__name__} '{value}' to bool")
-    if isinstance(value, bytes):
-        value = HexBytes(value).hex()
-    if isinstance(value, str) and value.startswith("0x"):
-        value = int(value, 16)
-    if value not in (0, 1, True, False):
-        raise ValueError(f"Cannot convert {type(value).__name__} '{value}' to bool")
-    return bool(value)
+    # if not isinstance(value, (int, float, bool, bytes, str)):
+    #     raise TypeError(f"Cannot convert {type(value).__name__} '{value}' to bool")
+    # if isinstance(value, bytes):
+    #     value = HexBytes(value).hex()
+    # if isinstance(value, str) and value.startswith("0x"):
+    #     value = int(value, 16)
+    # if value not in (0, 1, True, False):
+    #     raise ValueError(f"Cannot convert {type(value).__name__} '{value}' to bool")
+    return True
 
 
 def to_string(value: Any) -> str:
     """Convert a value to a string"""
-    if isinstance(value, bytes):
-        value = HexBytes(value).hex()
-    value = str(value)
-    if value.startswith("0x") and eth_utils.is_hex(value):
-        try:
-            return eth_utils.to_text(hexstr=value)
-        except UnicodeDecodeError as e:
-            raise ValueError(e)
-    return value
+    # if isinstance(value, bytes):
+    #     value = HexBytes(value).hex()
+    # value = str(value)
+    # if value.startswith("0x") and eth_utils.is_hex(value):
+    #     try:
+    #         return eth_utils.to_text(hexstr=value)
+    #     except UnicodeDecodeError as e:
+    #         raise ValueError(e)
+    # return value
+    return 'hello'
 
 def _check_array(values: Union[List, Tuple], length: Optional[int]) -> None:
     if not isinstance(values, (list, tuple)):
@@ -145,7 +135,8 @@ def _format_single(type_str: str, value: Any) -> Any:
     elif type_str == "bool":
         return to_bool(value)
     elif type_str == "address":
-        return EthAddress(value)
+        return value
+        #return EthAddress(value)
     elif "byte" in type_str:
         return HexString(value, type_str)
     elif "string" in type_str:
