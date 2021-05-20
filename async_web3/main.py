@@ -1,10 +1,10 @@
 import asyncio
 import itertools
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 import logging
 import websockets
 import json
-from web3.types import Wei, Address
+from web3.types import Wei, Address, Web3
 
 from .subscription import Subscription
 from .methods import RPCMethod
@@ -48,6 +48,18 @@ class AsyncWeb3:
         assert isinstance(address, Address)
         hex_wei = await self._do_request(RPCMethod.eth_getBalance, [address])
         return Wei(int(hex_wei, 16))
+
+    async def get_storage_at(
+        self, address: Address, storage_position: Union[int, str], block: Any
+    ) -> str:
+        if isinstance(block, str) and block in ["latest", "earliest", "pending"]:
+            block_param = block
+        else:
+            block_param = Web3.toHex(block)
+        return await self._do_request(
+            RPCMethod.eth_getStorageAt,
+            [address, Web3.toHex(storage_position), block_param],
+        )
 
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")

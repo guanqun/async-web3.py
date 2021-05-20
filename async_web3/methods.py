@@ -4,6 +4,7 @@ class RPCMethod:
     eth_gasPrice = "eth_gasPrice"
 
     eth_getBalance = "eth_getBalance"
+    eth_getStorageAt = "eth_getStorageAt"
 
     eth_subscribe = "eth_subscribe"
     eth_unsubscribe = "eth_unsubscribe"
