@@ -1,13 +1,15 @@
 import asyncio
 import itertools
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Any, Union, List
 import logging
 import websockets
 import json
-from web3.types import Wei, Address, Web3
+from web3.types import Wei, Address
+from web3 import Web3
 
 from .subscription import Subscription
 from .methods import RPCMethod
+from .contract import Contract
 
 
 class AsyncWeb3:
@@ -28,11 +30,19 @@ class AsyncWeb3:
 
     async def is_connect(self):
         try:
-            await self._do_request("web3_clientVersion")
+            await self.client_version()
         except Exception:
             return False
 
         return True
+
+    @property
+    async def client_version(self) -> str:
+        return await self._do_request(RPCMethod.web3_clientVersion)
+
+    @property
+    async def accounts(self):
+        return await self._do_request(RPCMethod.eth_accounts)
 
     @property
     async def block_number(self) -> int:
@@ -71,6 +81,9 @@ class AsyncWeb3:
             RPCMethod.eth_getBlockByNumber, [Web3.toHex(block_number), with_details]
         )
 
+    async def call(self):
+        self._do_request(RPCMethod.eth_call, [])
+
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")
 
@@ -87,6 +100,9 @@ class AsyncWeb3:
         queue = self._subscriptions[subscription.id]
         del self._subscriptions[subscription.id]
         queue.task_done()
+
+    def contract(self, address: Address, abi: List) -> Contract:
+        return Contract(self, address, abi)
 
     async def _do_subscribe(self, param: str):
         subscription_id = await self._do_request(RPCMethod.eth_subscribe, [param])

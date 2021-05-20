@@ -2,3 +2,4 @@
 2. add python lints. tox etc
 3. add .github actions
 4. add more useful APIs https://eth.wiki/json-rpc/API
+5. auto connect when used for the first time
