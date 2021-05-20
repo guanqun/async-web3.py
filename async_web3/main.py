@@ -63,33 +63,33 @@ class AsyncWeb3:
         queue.task_done()
 
     async def ws_request(self, method, params: Any = None):
-        counter = next(self.rpc_counter)
+        request_id = next(self.rpc_counter)
         rpc_dict = {
             "jsonrpc": "2.0",
             "method": method,
             "params": params or [],
-            "id": counter,
+            "id": request_id,
         }
         encoded = json.dumps(rpc_dict).encode("utf-8")
         fut = asyncio.get_event_loop().create_future()
-        self._requests[counter] = fut
+        self._requests[request_id] = fut
         await self.ws.send(encoded)
         self.logger.debug(f"websocket outbound: {encoded}")
         result = await fut
-        del self._requests[counter]
+        del self._requests[request_id]
         return result
 
     async def ws_process(self):
         async for msg in self.ws:
             self.logger.debug(f"websocket inbound: {msg}")
-            jo = json.loads(msg)
-            if "method" in jo and jo["method"] == "eth_subscription":
-                params = jo["params"]
+            j = json.loads(msg)
+            if "method" in j and j["method"] == "eth_subscription":
+                params = j["params"]
                 subscription_id = params["subscription"]
                 if subscription_id in self._subscriptions:
                     # TODO: maybe wrap this as block info?
                     self._subscriptions[subscription_id].put_nowait(params["result"])
-            if "id" in jo:
-                request_id = jo["id"]
+            if "id" in j:
+                request_id = j["id"]
                 if request_id in self._requests:
-                    self._requests[request_id].set_result(jo["result"])
+                    self._requests[request_id].set_result(j["result"])
