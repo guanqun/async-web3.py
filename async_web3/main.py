@@ -5,6 +5,7 @@ import logging
 import websockets
 import json
 
+
 class AsyncWeb3:
     logger = logging.getLogger("async_web3.AsyncWeb3")
 
@@ -36,7 +37,7 @@ class AsyncWeb3:
             "params": params or [],
             "id": counter,
         }
-        encoded = json.dumps(rpc_dict).encode('utf-8')
+        encoded = json.dumps(rpc_dict).encode("utf-8")
         fut = asyncio.get_event_loop().create_future()
         self._requests[counter] = fut
         await self.ws.send(encoded)
@@ -50,6 +51,6 @@ class AsyncWeb3:
     async def ws_process(self):
         async for msg in self.ws:
             jo = json.loads(msg)
-            request_id = jo['id']
+            request_id = jo["id"]
             if request_id in self._requests:
-                self._requests[request_id].set_result(jo['result'])
+                self._requests[request_id].set_result(jo["result"])
