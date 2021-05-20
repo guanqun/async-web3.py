@@ -5,6 +5,8 @@ class RPCMethod:
 
     eth_getBalance = "eth_getBalance"
     eth_getStorageAt = "eth_getStorageAt"
+    eth_getBlockByHash = "eth_getBlockByHash"
+    eth_getBlockByNumber = "eth_getBlockByNumber"
 
     eth_subscribe = "eth_subscribe"
     eth_unsubscribe = "eth_unsubscribe"

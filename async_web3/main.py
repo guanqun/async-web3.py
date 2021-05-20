@@ -61,6 +61,16 @@ class AsyncWeb3:
             [address, Web3.toHex(storage_position), block_param],
         )
 
+    async def get_block_by_hash(self, hash_hex: str, with_details: bool = False):
+        return await self._do_request(
+            RPCMethod.eth_getBlockByHash, [hash_hex, with_details]
+        )
+
+    async def get_block_by_number(self, block_number: int, with_details: bool = False):
+        return await self._do_request(
+            RPCMethod.eth_getBlockByNumber, [Web3.toHex(block_number), with_details]
+        )
+
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")
 
