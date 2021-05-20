@@ -24,11 +24,11 @@ class AsyncWeb3:
 
     async def connect(self):
         self.ws = await websockets.connect(self.websocket_uri)
-        asyncio.get_event_loop().create_task(self.ws_process())
+        asyncio.get_event_loop().create_task(self._ws_process())
 
     async def is_connect(self):
         try:
-            await self.ws_request("web3_clientVersion")
+            await self._do_request("web3_clientVersion")
         except Exception:
             return False
 
@@ -36,33 +36,43 @@ class AsyncWeb3:
 
     @property
     async def block_number(self) -> int:
-        hex_block = await self.ws_request(RPCMethod.eth_blockNumber)
-        # it's a hex block
+        hex_block = await self._do_request(RPCMethod.eth_blockNumber)
         return int(hex_block, 16)
 
     @property
     async def gas_price(self) -> Wei:
-        hex_wei = await self.ws_request(RPCMethod.eth_gasPrice)
+        hex_wei = await self._do_request(RPCMethod.eth_gasPrice)
         return Wei(int(hex_wei, 16))
 
     async def get_balance(self, address: Address) -> Wei:
-        hex_wei = await self.ws_request(RPCMethod.eth_getBalance, [address])
+        assert isinstance(address, Address)
+        hex_wei = await self._do_request(RPCMethod.eth_getBalance, [address])
+        return Wei(int(hex_wei, 16))
 
     async def subscribe_block(self) -> Subscription:
-        subscription_id = await self.ws_request(RPCMethod.eth_subscribe, ["newHeads"])
+        return await self._do_subscribe("newHeads")
 
-        queue = asyncio.Queue()
-        self._subscriptions[subscription_id] = queue
-        return Subscription(subscription_id, queue)
+    async def subscribe_syncing(self) -> Subscription:
+        return await self._do_subscribe("syncing")
+
+    async def subscribe_new_pending_transaction(self) -> Subscription:
+        return await self._do_subscribe("newPendingTransactions")
 
     async def unsubscribe(self, subscription: Subscription):
-        response = await self.ws_request(RPCMethod.eth_unsubscribe, [subscription.id])
+        assert isinstance(subscription, Subscription)
+        response = await self._do_request(RPCMethod.eth_unsubscribe, [subscription.id])
         assert response
         queue = self._subscriptions[subscription.id]
         del self._subscriptions[subscription.id]
         queue.task_done()
 
-    async def ws_request(self, method, params: Any = None):
+    async def _do_subscribe(self, param: str):
+        subscription_id = await self._do_request(RPCMethod.eth_subscribe, [param])
+        queue = asyncio.Queue()
+        self._subscriptions[subscription_id] = queue
+        return Subscription(subscription_id, queue)
+
+    async def _do_request(self, method, params: Any = None):
         request_id = next(self.rpc_counter)
         rpc_dict = {
             "jsonrpc": "2.0",
@@ -79,7 +89,7 @@ class AsyncWeb3:
         del self._requests[request_id]
         return result
 
-    async def ws_process(self):
+    async def _ws_process(self):
         async for msg in self.ws:
             self.logger.debug(f"websocket inbound: {msg}")
             j = json.loads(msg)
