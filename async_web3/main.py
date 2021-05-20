@@ -20,7 +20,7 @@ class AsyncWeb3:
         self.ws: websockets.WebSocketClientProtocol = None
 
         self._requests: Dict[int, asyncio.Future] = {}
-        self._subscriptions: Dict[int, asyncio.Queue] = {}
+        self._subscriptions: Dict[str, asyncio.Queue] = {}
 
     async def connect(self):
         self.ws = await websockets.connect(self.websocket_uri)
@@ -49,12 +49,18 @@ class AsyncWeb3:
         hex_wei = await self.ws_request(RPCMethod.eth_getBalance, [address])
 
     async def subscribe_block(self) -> Subscription:
-        subscription_str = await self.ws_request(RPCMethod.eth_subscribe, ["newHeads"])
-        subscription_id = int(subscription_str, 16)
+        subscription_id = await self.ws_request(RPCMethod.eth_subscribe, ["newHeads"])
 
         queue = asyncio.Queue()
         self._subscriptions[subscription_id] = queue
-        return Subscription(queue)
+        return Subscription(subscription_id, queue)
+
+    async def unsubscribe(self, subscription: Subscription):
+        response = await self.ws_request(RPCMethod.eth_unsubscribe, [subscription.id])
+        assert response
+        queue = self._subscriptions[subscription.id]
+        del self._subscriptions[subscription.id]
+        queue.task_done()
 
     async def ws_request(self, method, params: Any = None):
         counter = next(self.rpc_counter)
@@ -79,10 +85,9 @@ class AsyncWeb3:
             jo = json.loads(msg)
             if "method" in jo and jo["method"] == "eth_subscription":
                 params = jo["params"]
-                subscription_id = int(params["subscription"], 16)
+                subscription_id = params["subscription"]
                 if subscription_id in self._subscriptions:
                     # TODO: maybe wrap this as block info?
-                    print("put in the queue")
                     self._subscriptions[subscription_id].put_nowait(params["result"])
             if "id" in jo:
                 request_id = jo["id"]

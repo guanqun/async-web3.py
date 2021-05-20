@@ -6,3 +6,4 @@ class RPCMethod:
     eth_getBalance = "eth_getBalance"
 
     eth_subscribe = "eth_subscribe"
+    eth_unsubscribe = "eth_unsubscribe"
