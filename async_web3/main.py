@@ -9,7 +9,7 @@ from web3 import Web3
 from .subscription import Subscription
 from .methods import RPCMethod
 from .contract import DeployedContract
-from .types import Wei, Address
+from .types import Wei, Address, HexString
 
 
 class AsyncWeb3:
@@ -86,6 +86,10 @@ class AsyncWeb3:
             block_identifier = hex(block_identifier)
 
         return await self._do_request(RPCMethod.eth_call, [call_transaction, block_identifier])
+
+    async def send_raw_transaction(self, txdata: HexString):
+        assert isinstance(txdata, HexString)
+        return await self._do_request(RPCMethod.eth_sendRawTransaction, [txdata])
 
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")
