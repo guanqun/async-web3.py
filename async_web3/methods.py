@@ -12,6 +12,7 @@ class RPCMethod:
     eth_getBlockByNumber = "eth_getBlockByNumber"
 
     eth_call = "eth_call"
+    eth_sendRawTransaction = "eth_sendRawTransaction"
 
     eth_subscribe = "eth_subscribe"
     eth_unsubscribe = "eth_unsubscribe"

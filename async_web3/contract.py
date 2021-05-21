@@ -19,8 +19,14 @@ from brownie.exceptions import (
 )
 from brownie.typing import AccountsType, TransactionReceiptType
 
+from eth_account import Account
 from .types import Wei, Address
 
+from eth_utils.toolz import (
+    assoc,
+    assoc_in,
+    dissoc,
+)
 
 class _ContractBase:
 
@@ -398,7 +404,7 @@ class _ContractMethod:
 
         return self.decode_output(data)
 
-    async def transact(self, *args: Tuple) -> TransactionReceiptType:
+    async def transact(self, *args: Tuple) -> Any:
         """
         Broadcast a transaction that calls this contract method.
 
@@ -415,23 +421,30 @@ class _ContractMethod:
         """
 
         args, tx = _get_tx(args)
+
         if not tx["from"]:
             raise AttributeError(
                 "Final argument must be a dict of transaction parameters that "
                 "includes a `from` field specifying the sender of the transaction"
             )
 
-        return tx["from"].transfer(
-            self._address,
-            tx["value"],
-            gas_limit=tx["gas"],
-            gas_buffer=tx["gas_buffer"],
-            gas_price=tx["gasPrice"],
-            nonce=tx["nonce"],
-            required_confs=tx["required_confs"],
-            data=self.encode_input(*args),
-            allow_revert=tx["allow_revert"],
-        )
+        if "chainId" not in tx:
+            # defaults to chainId = 1
+            tx.update({"chainId": 1})
+        if "gas" not in tx:
+            raise AttributeError("we need 'gas' parameter.")
+        if "gasPrice" not in tx:
+            raise AttributeError("we need 'gasPrice' parameter.")
+        if "nonce" not in tx:
+            raise AttributeError("we need 'nonce' parameter.")
+
+        tx.update({"to": self._address, "data": self.encode_input(*args)})
+
+        account = tx["from"]
+        signed_txn = account.sign_transaction(dissoc(tx, 'from'))
+
+        return await self.web3.send_raw_transaction(signed_txn.rawTransaction)
+
 
     def decode_input(self, hexstr: str) -> List:
         """
@@ -589,7 +602,6 @@ def _get_tx(args: Tuple) -> Tuple:
         "from": None,
         "value": 0,
         "gas": None,
-        "gas_buffer": None,
         "gasPrice": None,
         "nonce": None,
     }
