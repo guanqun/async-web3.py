@@ -23,12 +23,12 @@ jobs:
           poetry-version: 1.1.6
       - name: Install dependencies # install all dependencies
         run: poetry install
-      - name: Pylint # Run pylint static analysis
-        run: |
-          poetry run pylint async_web3
-      - name: mypy  # Run mypy static analysis
-        run: |
-          poetry run mypy -p async_web3
+#       - name: Pylint # Run pylint static analysis
+#         run: |
+#           poetry run pylint async_web3
+#       - name: mypy  # Run mypy static analysis
+#         run: |
+#           poetry run mypy -p async_web3
       - name: Pytest # Run pytest
         run: |
           poetry run coverage run -m --source=async_web3 pytest tests
