@@ -106,7 +106,7 @@ class DeployedContract(_ContractBase):
 
             # special logic to handle function overloading
             if not hasattr(self, abi["name"]):
-                overloaded = OverloadedMethod(address, name)
+                overloaded = OverloadedMethod(self.web3, address, name)
                 self._check_and_set(abi["name"], overloaded)
             getattr(self, abi["name"])._add_fn(abi)
 
