@@ -87,8 +87,7 @@ class AsyncWeb3:
 
         return await self._do_request(RPCMethod.eth_call, [call_transaction, block_identifier])
 
-    async def send_raw_transaction(self, txdata: HexString):
-        assert isinstance(txdata, HexString)
+    async def send_raw_transaction(self, txdata):
         return await self._do_request(RPCMethod.eth_sendRawTransaction, [txdata])
 
     async def subscribe_block(self) -> Subscription:
