@@ -1,13 +1,12 @@
-This is the opinionated web3 library, with following design goals in mind:
-1. Async, async and async!
-2. Use websocket as the first class support.
-3. Be simple for normal chain interactions.
+This is an opinionated web3 library.
 
-It's a working in progress right now.
+1. async as the first citizen.
+2. websocket support as the first citizen.
+3. it supports `eth_subscribe()` and `eth_unsubscribe()`.
 
+This library tries to simplify the interaction with the *deployed* contracts. You want to deploy a new smart contract, please checkout the awesome `brownie` tool.
 
-
-How to contribute:
+How to Contribute:
 
 1. install `poetry`
 2. under this folder, run `poetry install`
