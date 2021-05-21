@@ -79,8 +79,13 @@ class AsyncWeb3:
             RPCMethod.eth_getBlockByNumber, [Web3.toHex(block_number), with_details]
         )
 
-    async def call(self, call_transaction):
-        return await self._do_request(RPCMethod.eth_call, [call_transaction])
+    async def call(self, call_transaction: Dict, block_identifier: Union[int, str, bytes] = None):
+        if block_identifier is None:
+            block_identifier = 'latest'
+        elif isinstance(block_identifier, int):
+            block_identifier = hex(block_identifier)
+
+        return await self._do_request(RPCMethod.eth_call, [call_transaction, block_identifier])
 
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")
