@@ -4,12 +4,12 @@ from typing import Optional, Dict, Any, Union, List
 import logging
 import websockets
 import json
-from web3.types import Wei, Address
 from web3 import Web3
 
 from .subscription import Subscription
 from .methods import RPCMethod
-from .contract import Contract
+from .contract import DeployedContract
+from .types import Wei, Address
 
 
 class AsyncWeb3:
@@ -51,13 +51,11 @@ class AsyncWeb3:
 
     @property
     async def gas_price(self) -> Wei:
-        hex_wei = await self._do_request(RPCMethod.eth_gasPrice)
-        return Wei(int(hex_wei, 16))
+        return Wei(await self._do_request(RPCMethod.eth_gasPrice))
 
     async def get_balance(self, address: Address) -> Wei:
         assert isinstance(address, Address)
-        hex_wei = await self._do_request(RPCMethod.eth_getBalance, [address])
-        return Wei(int(hex_wei, 16))
+        return Wei(await self._do_request(RPCMethod.eth_getBalance, [address]))
 
     async def get_storage_at(
         self, address: Address, storage_position: Union[int, str], block: Any
@@ -101,8 +99,9 @@ class AsyncWeb3:
         del self._subscriptions[subscription.id]
         queue.task_done()
 
-    def contract(self, address: Address, abi: List) -> Contract:
-        return Contract(self, address, abi)
+    def contract(self, address: Address, abi: List) -> DeployedContract:
+        assert isinstance(address, Address)
+        return DeployedContract(self, address, abi)
 
     async def _do_subscribe(self, param: str):
         subscription_id = await self._do_request(RPCMethod.eth_subscribe, [param])
