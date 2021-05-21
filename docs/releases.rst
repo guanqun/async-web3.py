@@ -3,7 +3,18 @@ Release Notes
 
 .. towncrier release notes start
 
-v0.1.0 (2021-05-21)v0.1.0 (2021-05-21)
+
+v0.1.2 (2021-05-21)
+-------------------
+
+Bugfixs
+~~~~~~~
+
+- Fix a missing parameter for OverloadedMethod
+- Bump the pyproject's version to the right one
+
+
+v0.1.0 (2021-05-21)
 -------------------
 
 Features
