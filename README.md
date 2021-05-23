@@ -6,6 +6,7 @@ This is an opinionated web3 library.
 
 ```
         w3 = AsyncWeb3("ws://127.0.0.1:8546")
+        await w3.connect()
         block_stream = await w3.subscribe_block()
         async for new_block in block_stream:
             print(f"got new block: {new_block}")
