@@ -11,7 +11,7 @@ This is an opinionated web3 library.
             print(f"got new block: {new_block}")
 ```
 
-This library tries to simplify the interaction with the *deployed* contracts. You want to deploy a new smart contract, please checkout the awesome `brownie` tool.
+This library tries to simplify the interaction with the *deployed* contracts. If you want to deploy a new smart contract, please checkout the awesome `brownie` tool.
 
 How to Contribute:
 
