@@ -20,6 +20,7 @@ from brownie.exceptions import (
 from brownie.typing import AccountsType, TransactionReceiptType
 
 from eth_account import Account
+from eth_account.datastructures import SignedTransaction
 from .types import Wei, Address
 
 from eth_utils.toolz import (
@@ -404,22 +405,7 @@ class _ContractMethod:
 
         return self.decode_output(data)
 
-    async def transact(self, *args: Tuple) -> Any:
-        """
-        Broadcast a transaction that calls this contract method.
-
-        Arguments
-        ---------
-        *args
-            Contract method inputs. You can optionally provide a
-            dictionary of transaction properties as the last arg.
-
-        Returns
-        -------
-        TransactionReceipt
-            Object representing the broadcasted transaction.
-        """
-
+    def build_transaction(self, *args: Tuple) -> SignedTransaction:
         args, tx = _get_tx(args)
 
         if not tx["from"]:
@@ -442,9 +428,25 @@ class _ContractMethod:
 
         account = tx["from"]
         signed_txn = account.sign_transaction(dissoc(tx, 'from'))
+        return signed_txn
 
+    async def transact(self, *args: Tuple) -> Any:
+        """
+        Broadcast a transaction that calls this contract method.
+
+        Arguments
+        ---------
+        *args
+            Contract method inputs. You can optionally provide a
+            dictionary of transaction properties as the last arg.
+
+        Returns
+        -------
+        TransactionReceipt
+            Object representing the broadcasted transaction.
+        """
+        signed_txn = self.build_transaction(*args)
         return await self.web3.send_raw_transaction(signed_txn.rawTransaction)
-
 
     def decode_input(self, hexstr: str) -> List:
         """
@@ -556,12 +558,13 @@ class ContractTx(_ContractMethod):
 
         Returns
         -------
-        TransactionReceipt
+        An Awaitable Object
             Object representing the broadcasted transaction.
         """
-
         return self.transact(*args)
 
+    def build(self, *args: Tuple) -> SignedTransaction:
+        return self.build_transaction(*arg)
 
 class ContractCall(_ContractMethod):
 
