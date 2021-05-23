@@ -11,6 +11,8 @@ This is an opinionated web3 library.
         async for new_block in block_stream:
             print(f"got new block: {new_block}")
 ```
+4. It has no middleware support.
+
 
 This library tries to simplify the interaction with the *deployed* contracts. If you want to deploy a new smart contract, please checkout the awesome `brownie` tool.
 
