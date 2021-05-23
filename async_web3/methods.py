@@ -10,6 +10,7 @@ class RPCMethod:
     eth_getStorageAt = "eth_getStorageAt"
     eth_getBlockByHash = "eth_getBlockByHash"
     eth_getBlockByNumber = "eth_getBlockByNumber"
+    eth_getTransactionCount = "eth_getTransactionCount"
 
     eth_call = "eth_call"
     eth_sendRawTransaction = "eth_sendRawTransaction"

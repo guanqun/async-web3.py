@@ -12,6 +12,15 @@ from .contract import DeployedContract
 from .types import Wei, Address, HexString
 
 
+def _format_block_identifier(block_identifier: Union[int, str, bytes]):
+    if block_identifier is None:
+        return 'latest'
+    elif isinstance(block_identifier, int):
+        return hex(block_identifier)
+    else:
+        return block_identifier
+
+
 class AsyncWeb3:
     logger = logging.getLogger("async_web3.AsyncWeb3")
 
@@ -30,7 +39,7 @@ class AsyncWeb3:
 
     async def is_connect(self):
         try:
-            await self.client_version()
+            await self.client_version
         except Exception:
             return False
 
@@ -57,6 +66,10 @@ class AsyncWeb3:
         assert isinstance(address, Address)
         return Wei(await self._do_request(RPCMethod.eth_getBalance, [address]))
 
+    async def get_transaction_count(self, address: Address, block_identifier: Union[int, str, bytes] = None) -> Wei:
+        block_identifier = _format_block_identifier(block_identifier)
+        return Wei(await self._do_request(RPCMethod.eth_getTransactionCount, [address, block_identifier]))
+
     async def get_storage_at(
         self, address: Address, storage_position: Union[int, str], block: Any
     ) -> str:
@@ -80,11 +93,7 @@ class AsyncWeb3:
         )
 
     async def call(self, call_transaction: Dict, block_identifier: Union[int, str, bytes] = None):
-        if block_identifier is None:
-            block_identifier = 'latest'
-        elif isinstance(block_identifier, int):
-            block_identifier = hex(block_identifier)
-
+        block_identifier = _format_block_identifier(block_identifier)
         return await self._do_request(RPCMethod.eth_call, [call_transaction, block_identifier])
 
     async def send_raw_transaction(self, txdata):
