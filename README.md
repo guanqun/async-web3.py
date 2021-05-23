@@ -1,8 +1,15 @@
 This is an opinionated web3 library.
 
 1. async as the first citizen.
-2. websocket support as the first citizen.
+2. websocket support as the first citizen. (IPC will be added in the near future)
 3. it supports `eth_subscribe()` and `eth_unsubscribe()`.
+
+```
+        w3 = AsyncWeb3("ws://127.0.0.1:8546")
+        block_stream = await w3.subscribe_block()
+        async for new_block in block_stream:
+            print(f"got new block: {new_block}")
+```
 
 This library tries to simplify the interaction with the *deployed* contracts. You want to deploy a new smart contract, please checkout the awesome `brownie` tool.
 
