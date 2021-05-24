@@ -9,7 +9,7 @@ readme = "README.md"
 homepage = "https://github.com/guanqun/async-web3.py"
 repository = "https://github.com/guanqun/async-web3.py"
 
-keywords = ["ethereum", "web3"]
+keywords = ["ethereum", "web3", "asyncio"]
 include = [
     "LICENSE",
 ]
