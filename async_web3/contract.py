@@ -446,7 +446,7 @@ class _ContractMethod:
             Object representing the broadcasted transaction.
         """
         signed_txn = self.build_transaction(*args)
-        return await self.web3.send_raw_transaction(signed_txn.rawTransaction)
+        return await self.web3.send_raw_transaction(signed_txn.rawTransaction.hex())
 
     def decode_input(self, hexstr: str) -> List:
         """
