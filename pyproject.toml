@@ -1,8 +1,28 @@
 [tool.poetry]
 name = "async-web3"
 version = "0.2.2"
-description = ""
+description = "Async Web3 library"
 authors = ["Guanqun Lu <guanqunlu@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+
+homepage = "https://github.com/guanqun/async-web3.py"
+repository = "https://github.com/guanqun/async-web3.py"
+
+keywords = ["ethereum", "web3"]
+include = [
+    "LICENSE",
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 [tool.poetry.dependencies]
 python = "^3.9"
