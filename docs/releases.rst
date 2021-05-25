@@ -3,6 +3,14 @@ Release Notes
 
 .. towncrier release notes start
 
+Async_Web3 0.2.2 (2021-05-25)
+-----------------------------
+
+Bugfixes
+~~~~~~~~
+
+- Fix the sendRawTransaction not serializable error. (`#11 <https://github.com/guanqun/async-web3.py/issues/11>`__)
+
 
 v0.1.2 (2021-05-21)
 -------------------
