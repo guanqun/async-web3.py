@@ -102,6 +102,9 @@ class AsyncWeb3:
     async def get_transaction_receipt(self, txhash):
         return await self._do_request(RPCMethod.eth_getTransactionReceipt, [txhash])
 
+    async def get_transaction(self, txhash):
+        return await self._do_request(RPCMethod.eth_getTransactionByHash, [txhash])
+
     async def subscribe_block(self) -> Subscription:
         return await self._do_subscribe("newHeads")
 
