@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "async-web3"
-version = "0.2.3"
+version = "0.2.4"
 description = "Async Web3 library"
 authors = ["Guanqun Lu <guanqunlu@outlook.com>"]
 license = "MIT"
