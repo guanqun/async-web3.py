@@ -10,6 +10,7 @@ from .subscription import Subscription
 from .methods import RPCMethod
 from .contract import DeployedContract
 from .types import Wei, Address, HexString
+from .transport import BaseTransport
 
 
 def _format_block_identifier(block_identifier: Union[int, str, bytes]):
@@ -24,18 +25,17 @@ def _format_block_identifier(block_identifier: Union[int, str, bytes]):
 class AsyncWeb3:
     logger = logging.getLogger("async_web3.AsyncWeb3")
 
-    def __init__(self, websocket_uri: str):
-        self.websocket_uri = websocket_uri
+    def __init__(self, transport: BaseTransport):
+        self._trasport = transport
 
         self.rpc_counter = itertools.count(1)
-        self.ws: Optional[websockets.WebSocketClientProtocol] = None
 
         self._requests: Dict[int, asyncio.Future] = {}
         self._subscriptions: Dict[str, asyncio.Queue] = {}
 
     async def connect(self):
-        self.ws = await websockets.connect(self.websocket_uri)
-        asyncio.get_event_loop().create_task(self._ws_process())
+        await self._trasport.connect()
+        asyncio.get_event_loop().create_task(self._process())
 
     async def is_connect(self):
         try:
@@ -146,15 +146,19 @@ class AsyncWeb3:
         encoded = json.dumps(rpc_dict).encode("utf-8")
         fut = asyncio.get_event_loop().create_future()
         self._requests[request_id] = fut
-        await self.ws.send(encoded)
-        self.logger.debug(f"websocket outbound: {encoded}")
+        await self._trasport.send(encoded)
+        self.logger.debug(f"outbound: {encoded}")
         result = await fut
         del self._requests[request_id]
         return result
 
-    async def _ws_process(self):
-        async for msg in self.ws:
-            self.logger.debug(f"websocket inbound: {msg}")
+    async def _process(self):
+        while True:
+            msg = await self._trasport.receive()
+            if msg is None:
+                break
+
+            self.logger.debug(f"inbound: {msg}")
             j = json.loads(msg)
             if "method" in j and j["method"] == "eth_subscription":
                 params = j["params"]
