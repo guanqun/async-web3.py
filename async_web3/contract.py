@@ -564,7 +564,8 @@ class ContractTx(_ContractMethod):
         return self.transact(*args)
 
     def build(self, *args: Tuple) -> SignedTransaction:
-        return self.build_transaction(*arg)
+        return self.build_transaction(*args)
+
 
 class ContractCall(_ContractMethod):
 
