@@ -36,7 +36,7 @@ class IPCTransport(BaseTransport):
         return await self._reader.readuntil()
 
 
-class WebsocketTransport:
+class WebsocketTransport(BaseTransport):
 
     def __init__(self, websocket_uri: str):
         self._websocket_uri = websocket_uri
