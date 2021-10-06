@@ -114,6 +114,9 @@ class AsyncWeb3:
     async def subscribe_syncing(self) -> Subscription:
         return await self._do_subscribe("syncing")
 
+    async def subscribe_logs(self, **options) -> Subscription:
+        return await self._do_subscribe("logs", options)
+
     async def subscribe_new_pending_transaction(self) -> Subscription:
         return await self._do_subscribe("newPendingTransactions")
 
@@ -129,8 +132,8 @@ class AsyncWeb3:
         assert isinstance(address, Address)
         return DeployedContract(self, address, abi)
 
-    async def _do_subscribe(self, param: str):
-        subscription_id = await self._do_request(RPCMethod.eth_subscribe, [param])
+    async def _do_subscribe(self, *args):
+        subscription_id = await self._do_request(RPCMethod.eth_subscribe, args)
         queue = asyncio.Queue()
         self._subscriptions[subscription_id] = queue
         return Subscription(subscription_id, queue)
