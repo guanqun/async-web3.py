@@ -6,7 +6,7 @@ import websockets
 class BaseTransport(abc.ABC):
 
     @abc.abstractmethod
-    async def connect(self):
+    async def connect(self, *args, **kwargs):
         pass
 
     @abc.abstractmethod
@@ -25,8 +25,8 @@ class IPCTransport(BaseTransport):
         self._writer = None
         self._reader = None
 
-    async def connect(self):
-        self._reader, self._writer = await asyncio.open_unix_connection(self._local_ipc_path)
+    async def connect(self, *args, **kwargs):
+        self._reader, self._writer = await asyncio.open_unix_connection(self._local_ipc_path, *args, **kwargs)
 
     async def send(self, data: bytes):
         self._writer.write(data)
@@ -42,8 +42,8 @@ class WebsocketTransport(BaseTransport):
         self._websocket_uri = websocket_uri
         self._ws = None
 
-    async def connect(self):
-        self._ws = await websockets.connect(self._websocket_uri)
+    async def connect(self, *args, **kwargs):
+        self._ws = await websockets.connect(self._websocket_uri, *args, **kwargs)
 
     async def send(self, data: bytes):
         await self._ws.send(data)
