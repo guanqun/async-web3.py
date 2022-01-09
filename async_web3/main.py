@@ -33,8 +33,8 @@ class AsyncWeb3:
         self._requests: Dict[int, asyncio.Future] = {}
         self._subscriptions: Dict[str, asyncio.Queue] = {}
 
-    async def connect(self):
-        await self._trasport.connect()
+    async def connect(self, *args, **kwargs):
+        await self._trasport.connect(*args, **kwargs)
         asyncio.get_event_loop().create_task(self._process())
 
     async def is_connect(self):
