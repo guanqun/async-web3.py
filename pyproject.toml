@@ -35,7 +35,7 @@ eth-brownie = "^1.14.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.3"
-coverage = "^5.5"
+coverage = "^6.4"
 mypy = "^0.902"
 pylint = "^2.9.4"
 Sphinx = "^4.0.2"
