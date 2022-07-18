@@ -37,7 +37,7 @@ eth-brownie = "^1.14.6"
 pytest = "^6.2.3"
 coverage = "^5.5"
 mypy = "^0.902"
-pylint = "^2.14.2"
+pylint = "^2.14.5"
 Sphinx = "^4.0.2"
 towncrier = "^21.3.0"
 
