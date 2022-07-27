@@ -38,7 +38,7 @@ pytest = "^6.2.3"
 coverage = "^5.5"
 mypy = "^0.902"
 pylint = "^2.14.2"
-Sphinx = "^4.0.2"
+Sphinx = "^5.1.1"
 towncrier = "^21.3.0"
 
 [tool.black]
