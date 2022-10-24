@@ -27,7 +27,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 websockets = "9.1"
-pytest-asyncio = "^0.15.1"
+pytest-asyncio = ">=0.15.1,<0.21.0"
 web3 = "^5.18.0"
 eth-utils = "^1.10.0"
 eth-abi = "^2.1.1"
